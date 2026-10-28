@@ -1,0 +1,108 @@
+{
+  "name": "@jeftelabs/middleware",
+  "version": "1.0.0",
+  "description": "Implementation of the chain of responsibility design pattern",
+  "type": "module",
+  "files": [
+    "build",
+    "!build/benchmarks",
+    "!build/bin",
+    "!build/tests"
+  ],
+  "exports": {
+    ".": "./build/index.js",
+    "./types": "./build/src/types.js"
+  },
+  "scripts": {
+    "pretest": "npm run lint",
+    "test": "c8 npm run quick:test",
+    "lint": "eslint",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "precompile": "npm run lint",
+    "compile": "tsdown && tsc --emitDeclarationOnly --declaration",
+    "build": "npm run compile",
+    "version": "npm run build",
+    "prepublishOnly": "npm run build",
+    "release": "release-it",
+    "quick:test": "cross-env NODE_DEBUG=jeftelabs:middleware node --import=@jeftelabs/exec bin/test.ts",
+    "benchmark": "node --import=@jeftelabs/exec benchmarks/index.ts",
+    "prepare": "husky",
+    "commitlint": "commitlint --edit",
+    "commit": "cz"
+  },
+  "homepage": "https://github.com/jeftelabs/middleware#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeftelabs/middleware.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jeftelabs/middleware/issues"
+  },
+  "keywords": [
+    "middleware"
+  ],
+  "author": "JefteCosta <jefteamorim@gmail.com>",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "tsdown": {
+    "entry": [
+      "./index.ts",
+      "./src/types.ts"
+    ],
+    "outDir": "./build",
+    "clean": true,
+    "format": "esm",
+    "minify": "dce-only",
+    "fixedExtension": false,
+    "dts": false,
+    "treeshake": false,
+    "sourcemaps": false,
+    "target": "esnext"
+  },
+  "c8": {
+    "reporter": [
+      "text",
+      "html"
+    ],
+    "exclude": [
+      "tests/**"
+    ]
+  },
+  "prettier": "@arapucajs/prettier",
+  "devDependencies": {
+    "@arapucajs/eslint-config": "^1.2.0",
+    "@arapucajs/prettier": "^1.2.0",
+    "@arapucajs/tsconfig": "^1.0.0",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@jeftelabs/exec": "^1.0.1",
+    "@t8ngs/assert": "^1.0.0",
+    "@t8ngs/runner": "^1.0.1",
+    "@types/node": "^26.6.5",
+    "benchmark": "^2.1.4",
+    "c8": "^12.0.0",
+    "commitizen": "^4.3.2",
+    "husky": "^9.1.7",
+    "cz-conventional-changelog": "^3.3.0",
+    "cross-env": "^10.1.0",
+    "eslint": "^10.13.0",
+    "fastseries": "^2.0.0",
+    "prettier": "^3.9.10",
+    "tsdown": "^0.23.2",
+    "typescript": "^6.0.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "prepare-commit-msg": "exec < /dev/tty && npx cz --hook || true"
+    }
+  }
+}
