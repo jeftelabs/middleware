@@ -136,7 +136,7 @@ export class Runner<MiddlewareFn extends any> {
    * Start the middleware queue and pass params to it. The `params`
    * array will be passed as spread arguments.
    */
-  async run(cb: Executor<MiddlewareFn>): Promise<void> {
+  async run(cb: Executor<MiddlewareFn>): Promise<any> {
     this.#executor = cb
     debug('starting middleware chain with %d middleware', this.#middleware.length)
 

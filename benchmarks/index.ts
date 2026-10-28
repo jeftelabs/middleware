@@ -6,27 +6,25 @@ import Fastseries from 'fastseries'
 import type { NextFn } from '../src/types.ts'
 import { Middleware } from '../src/middleware.ts'
 
+const runtime = process.versions.bun
+  ? `Bun ${process.versions.bun}`
+  : `Node.js ${process.versions.node}`
+
+console.log(`Runtime: ${runtime}; workload: four synchronous middleware handlers`)
+
 const suite = new benchmark.Suite()
 
 /**
- * Poppinss middleware setup
+ * Current package middleware setup
  */
-const middleware = new Middleware<(ctx: any, next: NextFn) => void>()
-middleware.add(async function one(_, next) {
-  await next()
-})
-middleware.add(async function two(_, next) {
-  await next()
-})
-middleware.add(async function three(_, next) {
-  await next()
-})
-middleware.add(async function four(_, next) {
-  await next()
-})
+const middleware = new Middleware<(ctx: any, next: NextFn) => any>()
+middleware.add((_, next) => next())
+middleware.add((_, next) => next())
+middleware.add((_, next) => next())
+middleware.add((_, next) => next())
 
 /**
- * Fast series middlewar
+ * Fastseries setup, using the same four-handler pass-through workload.
  */
 const series = Fastseries({ results: true })
 const seriesStack = [
