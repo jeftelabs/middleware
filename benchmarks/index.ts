@@ -1,0 +1,67 @@
+// @ts-expect-error
+import benchmark from 'benchmark'
+// @ts-expect-error
+import Fastseries from 'fastseries'
+
+import type { NextFn } from '../src/types.ts'
+import { Middleware } from '../src/middleware.ts'
+
+const runtime = process.versions.bun
+  ? `Bun ${process.versions.bun}`
+  : `Node.js ${process.versions.node}`
+
+console.log(`Runtime: ${runtime}; workload: four synchronous middleware handlers`)
+
+const suite = new benchmark.Suite()
+
+/**
+ * Current package middleware setup
+ */
+const middleware = new Middleware<(ctx: any, next: NextFn) => any>()
+middleware.add((_, next) => next())
+middleware.add((_, next) => next())
+middleware.add((_, next) => next())
+middleware.add((_, next) => next())
+
+/**
+ * Fastseries setup, using the same four-handler pass-through workload.
+ */
+const series = Fastseries({ results: true })
+const seriesStack = [
+  function one(_: any, next: any) {
+    next(null)
+  },
+  function two(_: any, next: any) {
+    next(null)
+  },
+  function three(_: any, next: any) {
+    next(null)
+  },
+  function four(_: any, next: any) {
+    next(null)
+  },
+]
+
+suite
+  .add('@jeftelabs/middleware', {
+    defer: true,
+    fn(deferred: any) {
+      middleware
+        .runner()
+        .run(async (fn, next) => fn({}, next))
+        .then(() => deferred.resolve())
+    },
+  })
+  .add('fastseries', {
+    defer: true,
+    fn(deferred: any) {
+      series({}, seriesStack, {}, () => deferred.resolve())
+    },
+  })
+  .on('cycle', function (event: any) {
+    console.log(String(event.target))
+  })
+  .on('complete', function (this: any) {
+    console.log('Fastest is ' + this.filter('fastest').map('name'))
+  })
+  .run({ async: true })
